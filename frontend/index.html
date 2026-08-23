@@ -4,30 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>College Admission Form</title>
+    <title>Student Admission Portal | College ERP System</title>
+    <meta name="description" content="Online Student Admission Portal with AI-powered Eligibility Verification, Document Upload, and Smart Application Wizard.">
 
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="admission-portal-body">
 
     <!-- Executive Admin ERP Top Header -->
     <header class="app-header-admin">
         <div class="header-brand-wrap">
             <div class="header-brand-logo">🎓</div>
             <div class="header-brand-titles">
-                <h1>College Management &amp; Administration System</h1>
+                <h1>Zeal College of Engineering &amp; Management</h1>
                 <div class="header-sub-breadcrumb">
-                    <span class="badge-adm-pill">Admission Management</span>
+                    <span class="badge-adm-pill">Admission Portal 2026-27</span>
                     <span class="adm-breadcrumb-sep">/</span>
-                    <span class="adm-breadcrumb-active">Student Admission Form</span>
+                    <span class="adm-breadcrumb-active" id="breadcrumbFormTitle">Online Application Wizard</span>
                 </div>
             </div>
         </div>
 
         <div class="header-admin-profile-wrap">
-            <a href="view.html" class="btn-erp-back-nav" title="Back to Admin Dashboard">
-                <span>📊</span> Back to Dashboard
+            <!-- Theme Toggle Button -->
+            <button type="button" class="btn-theme-toggle" id="themeToggleBtn" title="Toggle Dark/Light Mode" onclick="toggleTheme()">
+                <span id="themeToggleIcon">🌙</span>
+            </button>
+
+            <!-- Back to Dashboard / Login Link -->
+            <a href="view.html" class="btn-erp-back-nav" id="backNavBtn" title="Back to Admin Dashboard">
+                <span>📊</span> Dashboard
             </a>
 
             <!-- Logged-in Admin Profile Card -->
@@ -37,7 +50,7 @@
                 </div>
                 <div class="admin-info-text">
                     <strong class="admin-name" id="formAdminName">Administrator</strong>
-                    <span class="admin-role-label" id="formAdminRole">Administrator</span>
+                    <span class="admin-role-label" id="formAdminRole">Admissions Officer</span>
                 </div>
                 <button type="button" class="admin-logout-quick-btn" onclick="logoutAdminForm()" title="Sign Out">
                     🚪
@@ -46,319 +59,839 @@
         </div>
     </header>
 
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
     <!-- Main Container -->
+    <main class="admission-wizard-container">
 
-    <div class="container">
-
-        <div class="form-header-bar">
-            <h2>Student Admission Form</h2>
+        <!-- Wizard Top Banner & Header -->
+        <div class="wizard-hero-banner">
+            <div class="hero-left">
+                <div class="hero-badge">
+                    <span class="pulsing-dot"></span> B.Tech Direct Second Year &amp; FY Admissions Open
+                </div>
+                <h2 id="wizardMainTitle">Student Admission Application Form</h2>
+                <p id="wizardSubTitle">Complete the 6-step application process to secure your seat for Academic Year 2026-2027.</p>
+            </div>
+            <div class="hero-right">
+                <div class="draft-status-card" id="draftStatusCard">
+                    <span class="draft-icon">💾</span>
+                    <div class="draft-info">
+                        <small>Form Autosave</small>
+                        <strong id="draftStatusText">Ready</strong>
+                    </div>
+                    <button type="button" class="btn-draft-action" onclick="saveDraftManual()" title="Manually Save Draft">
+                        Save Now
+                    </button>
+                </div>
+            </div>
         </div>
-        <div id="errorMessage" class="error-box" style="display: none;"></div>
 
-<form id="admissionForm">
-
-    <fieldset>
-
-        <legend>Personal Information</legend>
-        
-
-        <div class="form-group">
-
-            <div class="input-box">
-                <label>Full Name</label>
-                <input type="text" id="fullName" placeholder="Enter Full Name" required>
+        <!-- Wizard Progress Bar & Stepper -->
+        <div class="wizard-stepper-card">
+            <div class="stepper-progress-wrapper">
+                <div class="stepper-progress-info">
+                    <span class="stepper-progress-label" id="stepProgressLabel">Step 1 of 6: Personal Information</span>
+                    <span class="stepper-progress-percent" id="stepProgressPercent">16% Completed</span>
+                </div>
+                <div class="stepper-progress-track">
+                    <div class="stepper-progress-fill" id="stepperProgressBar" style="width: 16.66%;"></div>
+                </div>
             </div>
 
-            <div class="input-box">
-                <label>Father's Name</label>
-                <input type="text" id="fatherName" placeholder="Enter Father's Name" required>
-            </div>
+            <!-- Stepper Navigation Items -->
+            <nav class="wizard-steps-nav" id="wizardStepsNav" aria-label="Admission Steps">
+                <button type="button" class="wizard-step-btn active" data-step="1" onclick="navigateToStep(1)">
+                    <div class="step-circle"><span class="step-num">1</span><span class="step-check">✓</span></div>
+                    <div class="step-label-group">
+                        <span class="step-title">Personal</span>
+                        <span class="step-sub">Applicant Info</span>
+                    </div>
+                </button>
 
+                <div class="step-line"></div>
+
+                <button type="button" class="wizard-step-btn" data-step="2" onclick="navigateToStep(2)">
+                    <div class="step-circle"><span class="step-num">2</span><span class="step-check">✓</span></div>
+                    <div class="step-label-group">
+                        <span class="step-title">Contact</span>
+                        <span class="step-sub">Phone &amp; Address</span>
+                    </div>
+                </button>
+
+                <div class="step-line"></div>
+
+                <button type="button" class="wizard-step-btn" data-step="3" onclick="navigateToStep(3)">
+                    <div class="step-circle"><span class="step-num">3</span><span class="step-check">✓</span></div>
+                    <div class="step-label-group">
+                        <span class="step-title">Academic</span>
+                        <span class="step-sub">10th, 12th &amp; CET</span>
+                    </div>
+                </button>
+
+                <div class="step-line"></div>
+
+                <button type="button" class="wizard-step-btn" data-step="4" onclick="navigateToStep(4)">
+                    <div class="step-circle"><span class="step-num">4</span><span class="step-check">✓</span></div>
+                    <div class="step-label-group">
+                        <span class="step-title">Course &amp; AI</span>
+                        <span class="step-sub">Branch &amp; Eligibility</span>
+                    </div>
+                </button>
+
+                <div class="step-line"></div>
+
+                <button type="button" class="wizard-step-btn" data-step="5" onclick="navigateToStep(5)">
+                    <div class="step-circle"><span class="step-num">5</span><span class="step-check">✓</span></div>
+                    <div class="step-label-group">
+                        <span class="step-title">Documents</span>
+                        <span class="step-sub">Upload Files</span>
+                    </div>
+                </button>
+
+                <div class="step-line"></div>
+
+                <button type="button" class="wizard-step-btn" data-step="6" onclick="navigateToStep(6)">
+                    <div class="step-circle"><span class="step-num">6</span><span class="step-check">✓</span></div>
+                    <div class="step-label-group">
+                        <span class="step-title">Review</span>
+                        <span class="step-sub">Verify &amp; Submit</span>
+                    </div>
+                </button>
+            </nav>
         </div>
 
-        <div class="form-group">
-
-            <div class="input-box">
-                <label>Mother's Name</label>
-                <input type="text" id="motherName" placeholder="Enter Mother's Name" required>
-            </div>
-
-            <div class="input-box">
-                <label>Date of Birth</label>
-                <input type="date" id="dob" required>
-            </div>
-
-        </div>
-
-        <div class="form-group">
-
-            <div class="input-box">
-                <label>Gender</label>
-
-               <select id="gender" required>
-             <option value="">Select Gender</option>
-             <option>Male</option>
-             <option>Female</option>
-             <option>Other</option>
-                 </select>
-
-            </div>
-
-            <div class="input-box">
-                <label>Blood Group</label>
-
-               <select id="bloodGroup" required>
-                  <option value="">Select Blood Group</option>
-                  <option>A+</option>
-                  <option>A-</option>
-                  <option>B+</option>
-                  <option>B-</option>
-                  <option>AB+</option>
-                  <option>AB-</option>
-                  <option>O+</option>
-                  <option>O-</option>
-              </select>
-
-            </div>
-
-        </div>
-
-    </fieldset>
-    <fieldset>
-
-    <legend>Contact Information</legend>
-
-    <div class="form-group">
-
-        <div class="input-box">
-            <label>Mobile Number</label>
-           <input type="tel" id="mobile" placeholder="Enter Mobile Number" required>
-        </div>
-
-        <div class="input-box">
-            <label>Alternate Mobile</label>
-           <input type="tel" id="altMobile" placeholder="Enter Alternate Mobile">
-        </div>
-
-    </div>
-
-    <div class="form-group">
-
-        <div class="input-box">
-            <label>Email Address</label>
-         <input type="email" id="email" placeholder="Enter Email Address" required>
-        </div>
-
-        <div class="input-box">
-            <label>Aadhaar Number</label>
-            <input type="text" id="aadhaar" placeholder="Enter Aadhaar Number" required>
-        </div>
-
-    </div>
-
-    <div class="form-group">
-
-        <div class="input-box">
-            <label>Address</label>
-            <textarea id="address" placeholder="Enter Full Address" required></textarea>
-        </div>
-
-    </div>
-
-    <div class="form-group">
-
-        <div class="input-box">
-            <label>City</label>
-           <input type="text" id="city" placeholder="Enter City" required>
-        </div>
-
-        <div class="input-box">
-            <label>State</label>
-            <input type="text" id="state" placeholder="Enter State" required>
-        </div>
-
-    </div>
-
-    <div class="form-group">
-
-        <div class="input-box">
-            <label>Pincode</label>
-          <input type="text" id="pincode" placeholder="Enter Pincode" required>
-        </div>
-
-        <div class="input-box">
-            <label>Nationality</label>
-            <input type="text" id="nationality" placeholder="Enter Nationality" required>
-        </div>
-
-    </div>
-
-</fieldset>
-<fieldset>
-
-    <legend>Academic Information</legend>
-
-    <div class="form-group">
-
-        <div class="input-box">
-            <label>10th Board</label>
-       <input type="text" id="board10" placeholder="Enter Board Name" required>
-        </div>
-
-        <div class="input-box">
-            <label>10th Percentage</label>
-
-                 <input
-                       type="number"
-                       id="percentage10"
-                       placeholder="Enter 10th Percentage"
-                       min="0"
-                       max="100"
-                       required>
-              </div>
-
-         </div>
-
-    <div class="form-group">
-
-        <div class="input-box">
-            <label>12th Board</label>
-            <input type="text" id="board12" placeholder="Enter 12th Board" required>
-        </div>
-
-        <div class="input-box">
-            <label>12th Percentage</label>
-           <input type="number" id="percentage12" placeholder="Enter 12th Percentage" min="0" max="100" required>
-        </div>
-
-    </div>
-
-    <div class="form-group">
-
-        <div class="input-box">
-            <label>Entrance Exam</label>
-
-            <select id="entranceExam" required>
-                    <option value="">Select Entrance Exam</option>
-                    <option>MHT-CET</option>
-                    <option>JEE</option>
-                    <option>NEET</option>
-                    <option>Other</option>
-            </select>
-        </div>
-
-        <div class="input-box">
-            <label>Entrance Score</label>
-           <input type="number" id="entranceScore" placeholder="Enter Entrance Score" required>
-        </div>
-
-    </div>
-
-</fieldset>
-<fieldset>
-
-    <legend>Course Selection</legend>
-
-    <div class="form-group">
-
-        <div class="input-box">
-
-            <label>Select Department</label>
-
-           <select id="department" required>
-                    <option value="">Select Department</option>
-                    <option>Computer Engineering</option>
-                    <option>Information Technology</option>
-                    <option>Artificial Intelligence & Data Science</option>
-                    <option>Electronics & Telecommunication</option>
-                    <option>Mechanical Engineering</option>
-                    <option>Civil Engineering</option>
-           </select>
-
-        </div>
-
-        <div class="input-box">
-
-            <label>Admission Type</label>
-
-            <select id="admissionType" required>
-                     <option value="">Select Admission Type</option>
-                     <option>CAP</option>
-                     <option>Management</option>
-                     <option>NRI</option>
-            </select>
-
-        </div>
-
-    </div>
-
-</fieldset>
-<fieldset>
-
-    <legend>Document Upload</legend>
-
-    <div class="form-group">
-
-        <div class="input-box">
-            <label>Passport Photo</label>
-           <input type="file" id="photo" accept="image/*">
-        </div>
-
-        <div class="input-box">
-            <label>10th Marksheet</label>
-            <input type="file" id="marksheet10">
-        </div>
-
-    </div>
-
-    <div class="form-group">
-
-        <div class="input-box">
-            <label>12th Marksheet</label>
-            <input type="file" id="marksheet12">
-        </div>
-
-        <div class="input-box">
-            <label>Leaving Certificate</label>
-            <input type="file" id="leavingCertificate">
-        </div>
-
-    </div>
-
-</fieldset>
-<fieldset>
-
-    <legend>Declaration</legend>
-
-    <label>
-
-       <input type="checkbox" id="declaration" required>
-
-        I hereby declare that the information provided above is true and correct.
-
-    </label>
-
-    <br><br>
-
-    <div class="button-group">
-
-        <button type="submit" class="submit-btn">
-            <span>🚀</span> Submit Application
+        <!-- Global Error Notification Box -->
+        <div id="errorMessage" class="error-box" style="display: none;" role="alert"></div>
+
+        <!-- Admission Form -->
+        <form id="admissionForm" class="admission-form-card" novalidate>
+
+            <!-- ======================================================= -->
+            <!-- STEP 1: PERSONAL INFORMATION -->
+            <!-- ======================================================= -->
+            <section class="wizard-step-section active" id="stepSection1" data-step="1">
+                <div class="section-heading-card">
+                    <div class="sec-icon-badge">👤</div>
+                    <div class="sec-title-wrap">
+                        <h3>Personal Information</h3>
+                        <p>Provide legal name and birth particulars as per secondary school marksheet.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="fullName" class="field-label required-label">Full Name of Student</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">👤</span>
+                            <input type="text" id="fullName" name="fullName" placeholder="e.g. Sanket Ramesh Amte" required autocomplete="name">
+                        </div>
+                        <span class="field-hint">Enter Name as printed on Class 10/12 Leaving Certificate</span>
+                    </div>
+
+                    <div class="form-field-group">
+                        <label for="fatherName" class="field-label required-label">Father's / Guardian's Full Name</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">👨</span>
+                            <input type="text" id="fatherName" name="fatherName" placeholder="e.g. Ramesh Shankar Amte" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="motherName" class="field-label required-label">Mother's Full Name</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">👩</span>
+                            <input type="text" id="motherName" name="motherName" placeholder="e.g. Sunita Ramesh Amte" required>
+                        </div>
+                    </div>
+
+                    <div class="form-field-group">
+                        <label for="dob" class="field-label required-label">Date of Birth</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">📅</span>
+                            <input type="date" id="dob" name="dob" required onchange="calculateAge()">
+                        </div>
+                        <div id="ageDisplayBadge" class="age-calc-badge" style="display: none;">
+                            <span id="ageText">Age: --</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="gender" class="field-label required-label">Gender</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">⚥</span>
+                            <select id="gender" name="gender" required>
+                                <option value="">-- Select Gender --</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-field-group">
+                        <label for="bloodGroup" class="field-label required-label">Blood Group</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">🩸</span>
+                            <select id="bloodGroup" name="bloodGroup" required>
+                                <option value="">-- Select Blood Group --</option>
+                                <option value="A+">A+ (A Positive)</option>
+                                <option value="A-">A- (A Negative)</option>
+                                <option value="B+">B+ (B Positive)</option>
+                                <option value="B-">B- (B Negative)</option>
+                                <option value="AB+">AB+ (AB Positive)</option>
+                                <option value="AB-">AB- (AB Negative)</option>
+                                <option value="O+">O+ (O Positive)</option>
+                                <option value="O-">O- (O Negative)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-action-bar">
+                    <div></div>
+                    <button type="button" class="btn-wizard-nav btn-next" onclick="validateAndNext(1)">
+                        Next: Contact Details <span>➔</span>
+                    </button>
+                </div>
+            </section>
+
+
+            <!-- ======================================================= -->
+            <!-- STEP 2: CONTACT & RESIDENTIAL -->
+            <!-- ======================================================= -->
+            <section class="wizard-step-section" id="stepSection2" data-step="2">
+                <div class="section-heading-card">
+                    <div class="sec-icon-badge">📞</div>
+                    <div class="sec-title-wrap">
+                        <h3>Contact &amp; Residential Information</h3>
+                        <p>Provide verified phone numbers, email address, and permanent residence info.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="mobile" class="field-label required-label">Primary Mobile Number</label>
+                        <div class="input-with-prefix">
+                            <span class="prefix-tag">+91</span>
+                            <input type="tel" id="mobile" name="mobile" placeholder="10-digit mobile number" maxlength="10" required autocomplete="tel" oninput="validatePhoneInput(this)">
+                        </div>
+                        <span class="field-hint">Admissions SMS updates &amp; OTPs will be sent here</span>
+                    </div>
+
+                    <div class="form-field-group">
+                        <label for="altMobile" class="field-label">Alternate / Parent Mobile</label>
+                        <div class="input-with-prefix">
+                            <span class="prefix-tag">+91</span>
+                            <input type="tel" id="altMobile" name="altMobile" placeholder="Parent / guardian number" maxlength="10" autocomplete="tel" oninput="validatePhoneInput(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="email" class="field-label required-label">Email Address</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">✉</span>
+                            <input type="email" id="email" name="email" placeholder="student@example.com" required autocomplete="email" oninput="checkEmailDomain(this)">
+                        </div>
+                        <div id="emailSuggestionBadge" class="email-suggestion-box" style="display: none;"></div>
+                    </div>
+
+                    <div class="form-field-group">
+                        <label for="aadhaar" class="field-label required-label">Aadhaar Card Number</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">🪪</span>
+                            <input type="text" id="aadhaar" name="aadhaar" placeholder="XXXX XXXX XXXX" maxlength="14" required oninput="formatAadhaar(this)">
+                        </div>
+                        <span class="field-hint">12-digit Unique Identification Number (UIDAI)</span>
+                    </div>
+                </div>
+
+                <div class="form-grid-1">
+                    <div class="form-field-group">
+                        <label for="address" class="field-label required-label">Full Residential Address</label>
+                        <div class="input-with-icon icon-textarea">
+                            <span class="input-icon">🏠</span>
+                            <textarea id="address" name="address" rows="3" placeholder="Enter flat/house no., street, locality, landmark" required></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid-3">
+                    <div class="form-field-group">
+                        <label for="city" class="field-label required-label">City / Town</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">🏙️</span>
+                            <input type="text" id="city" name="city" placeholder="e.g. Pune" required>
+                        </div>
+                    </div>
+
+                    <div class="form-field-group">
+                        <label for="state" class="field-label required-label">State</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">📍</span>
+                            <input type="text" id="state" name="state" placeholder="e.g. Maharashtra" required>
+                        </div>
+                    </div>
+
+                    <div class="form-field-group">
+                        <label for="pincode" class="field-label required-label">Pincode</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">📮</span>
+                            <input type="text" id="pincode" name="pincode" placeholder="6-digit PIN" maxlength="6" required oninput="validatePincode(this)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="nationality" class="field-label required-label">Nationality</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">🇮🇳</span>
+                            <input type="text" id="nationality" name="nationality" value="Indian" placeholder="e.g. Indian" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-action-bar">
+                    <button type="button" class="btn-wizard-nav btn-prev" onclick="navigateToStep(1)">
+                        <span>⬅</span> Previous Step
+                    </button>
+                    <button type="button" class="btn-wizard-nav btn-next" onclick="validateAndNext(2)">
+                        Next: Academic Scores <span>➔</span>
+                    </button>
+                </div>
+            </section>
+
+
+            <!-- ======================================================= -->
+            <!-- STEP 3: ACADEMIC QUALIFICATIONS -->
+            <!-- ======================================================= -->
+            <section class="wizard-step-section" id="stepSection3" data-step="3">
+                <div class="section-heading-card">
+                    <div class="sec-icon-badge">🎓</div>
+                    <div class="sec-title-wrap">
+                        <h3>Academic Qualifications &amp; Entrance Scores</h3>
+                        <p>Enter your 10th (SSC), 12th (HSC) / Diploma marks and Entrance Exam credentials.</p>
+                    </div>
+                </div>
+
+                <div class="academic-fieldset-card">
+                    <div class="card-mini-tag">10th Standard (SSC / Equivalent)</div>
+                    <div class="form-grid-2">
+                        <div class="form-field-group">
+                            <label for="board10" class="field-label required-label">10th Board Name</label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">🏫</span>
+                                <input type="text" id="board10" name="board10" placeholder="e.g. Maharashtra State Board / CBSE / ICSE" required>
+                            </div>
+                        </div>
+
+                        <div class="form-field-group">
+                            <label for="percentage10" class="field-label required-label">10th Percentage (%)</label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">%</span>
+                                <input type="number" id="percentage10" name="percentage10" placeholder="e.g. 85.60" min="0" max="100" step="0.01" required oninput="triggerAIPrediction()">
+                            </div>
+                            <div id="grade10Badge" class="grade-indicator-pill" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="academic-fieldset-card">
+                    <div class="card-mini-tag">12th Standard (HSC / Diploma)</div>
+                    <div class="form-grid-2">
+                        <div class="form-field-group">
+                            <label for="board12" class="field-label required-label">12th Board / Diploma Council</label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">🏫</span>
+                                <input type="text" id="board12" name="board12" placeholder="e.g. Maharashtra State Board / MSBTE / CBSE" required>
+                            </div>
+                        </div>
+
+                        <div class="form-field-group">
+                            <label for="percentage12" class="field-label required-label">12th / Diploma Percentage (%)</label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">%</span>
+                                <input type="number" id="percentage12" name="percentage12" placeholder="e.g. 78.40" min="0" max="100" step="0.01" required oninput="triggerAIPrediction()">
+                            </div>
+                            <div id="grade12Badge" class="grade-indicator-pill" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="academic-fieldset-card highlight-entrance">
+                    <div class="card-mini-tag">Competitive Entrance Exam</div>
+                    <div class="form-grid-2">
+                        <div class="form-field-group">
+                            <label for="entranceExam" class="field-label required-label">Entrance Exam Appeared</label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">📝</span>
+                                <select id="entranceExam" name="entranceExam" required onchange="triggerAIPrediction()">
+                                    <option value="">-- Select Exam --</option>
+                                    <option value="MHT-CET">MHT-CET (State CET)</option>
+                                    <option value="JEE">JEE Main</option>
+                                    <option value="NEET">NEET</option>
+                                    <option value="Other">Other State Entrance</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-field-group">
+                            <label for="entranceScore" class="field-label required-label">Entrance Score / Percentile</label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">🏆</span>
+                                <input type="number" id="entranceScore" name="entranceScore" placeholder="e.g. 88.50" min="0" max="200" step="0.01" required oninput="triggerAIPrediction()">
+                            </div>
+                            <span class="field-hint">Enter your MHT-CET / JEE Main Percentile or Marks</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-action-bar">
+                    <button type="button" class="btn-wizard-nav btn-prev" onclick="navigateToStep(2)">
+                        <span>⬅</span> Previous Step
+                    </button>
+                    <button type="button" class="btn-wizard-nav btn-next" onclick="validateAndNext(3)">
+                        Next: Course &amp; AI Predictor <span>➔</span>
+                    </button>
+                </div>
+            </section>
+
+
+            <!-- ======================================================= -->
+            <!-- STEP 4: COURSE SELECTION & AI PREDICTOR -->
+            <!-- ======================================================= -->
+            <section class="wizard-step-section" id="stepSection4" data-step="4">
+                <div class="section-heading-card">
+                    <div class="sec-icon-badge">🏛️</div>
+                    <div class="sec-title-wrap">
+                        <h3>Department Selection &amp; AI Predictor</h3>
+                        <p>Select your desired engineering branch and check real-time admission chances powered by AI.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-field-group">
+                        <label for="department" class="field-label required-label">Choose Engineering Department</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">⚙️</span>
+                            <select id="department" name="department" required onchange="triggerAIPrediction()">
+                                <option value="">-- Select Department --</option>
+                                <option value="Computer Engineering">Computer Engineering</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Artificial Intelligence & Data Science">Artificial Intelligence &amp; Data Science</option>
+                                <option value="Electronics & Telecommunication">Electronics &amp; Telecommunication</option>
+                                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                <option value="Civil Engineering">Civil Engineering</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-field-group">
+                        <label for="admissionType" class="field-label required-label">Admission Quota / Type</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">🎯</span>
+                            <select id="admissionType" name="admissionType" required>
+                                <option value="">-- Select Admission Type --</option>
+                                <option value="CAP">CAP (Centralized Admission Process)</option>
+                                <option value="Management">Institute / Management Quota</option>
+                                <option value="NRI">NRI / OCI / PIO Quota</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Eligibility & Admission Chances Card -->
+                <div class="ai-predictor-card" id="aiPredictorCard">
+                    <div class="ai-card-header">
+                        <div class="ai-logo-tag">
+                            <span class="ai-sparkle-icon">✨</span>
+                            <strong>Zeal AI Admission Insights &amp; Eligibility Engine</strong>
+                        </div>
+                        <span class="ai-live-badge">Live Evaluation</span>
+                    </div>
+
+                    <div class="ai-card-body">
+                        <div class="ai-probability-wrap">
+                            <div class="gauge-container">
+                                <div class="gauge-value" id="aiProbabilityValue">--%</div>
+                                <span class="gauge-caption">Admission Chance</span>
+                            </div>
+                            <div class="ai-chance-badge-wrap">
+                                <span class="chance-level-badge" id="aiChanceLevel">Pending Scores</span>
+                                <p class="ai-prob-desc" id="aiProbDesc">Enter your 10th %, 12th %, and Entrance score to evaluate admission probability.</p>
+                            </div>
+                        </div>
+
+                        <div class="ai-criteria-checklist" id="aiCriteriaChecklist">
+                            <h4>Department Eligibility Benchmark:</h4>
+                            <ul class="criteria-list" id="aiCriteriaList">
+                                <li class="criteria-item pending">
+                                    <span class="c-icon">⏳</span> 10th Percentage: Minimum 40.0% required
+                                </li>
+                                <li class="criteria-item pending">
+                                    <span class="c-icon">⏳</span> 12th Percentage: Department cutoff
+                                </li>
+                                <li class="criteria-item pending">
+                                    <span class="c-icon">⏳</span> Entrance Score: Department cutoff
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="ai-cutoff-note" id="aiCutoffNote">
+                        💡 <strong>Pro Tip:</strong> Computer &amp; AI branches have high demand. Ensure Entrance score &gt; 75 for optimal CAP Round allocation.
+                    </div>
+                </div>
+
+                <div class="step-action-bar">
+                    <button type="button" class="btn-wizard-nav btn-prev" onclick="navigateToStep(3)">
+                        <span>⬅</span> Previous Step
+                    </button>
+                    <button type="button" class="btn-wizard-nav btn-next" onclick="validateAndNext(4)">
+                        Next: Document Uploads <span>➔</span>
+                    </button>
+                </div>
+            </section>
+
+
+            <!-- ======================================================= -->
+            <!-- STEP 5: DOCUMENT UPLOADS -->
+            <!-- ======================================================= -->
+            <section class="wizard-step-section" id="stepSection5" data-step="5">
+                <div class="section-heading-card">
+                    <div class="sec-icon-badge">📁</div>
+                    <div class="sec-title-wrap">
+                        <h3>Document Uploads &amp; Verification</h3>
+                        <p>Upload clear scanned copies of required documents (Max 5MB each, JPG, PNG or PDF).</p>
+                    </div>
+                </div>
+
+                <div class="upload-progress-summary">
+                    <span class="upload-summary-title">Mandatory Documents Checklist:</span>
+                    <div class="upload-counter-badge" id="uploadCounterBadge">0 of 4 Uploaded</div>
+                </div>
+
+                <div class="upload-grid-container">
+
+                    <!-- Document 1: Passport Photo -->
+                    <div class="dropzone-card" id="dropzonePhoto">
+                        <div class="dropzone-header">
+                            <div class="doc-badge-pill req">Required</div>
+                            <span class="doc-icon-main">📷</span>
+                            <h4>Passport Size Photograph</h4>
+                            <p>Recent color photo with white background (JPG/PNG, Max 2MB)</p>
+                        </div>
+                        <div class="dropzone-body" onclick="document.getElementById('photo').click()">
+                            <input type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="handleFileSelected(this, 'previewPhoto', 'dropzonePhoto')">
+                            <div class="dropzone-placeholder" id="placeholderPhoto">
+                                <span class="upload-cloud-icon">☁️</span>
+                                <strong>Click to Browse</strong> or Drag &amp; Drop Photo
+                                <small>Supported: JPG, JPEG, PNG (Max 2MB)</small>
+                            </div>
+                            <div class="dropzone-preview" id="previewPhoto" style="display:none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Document 2: 10th Marksheet -->
+                    <div class="dropzone-card" id="dropzoneMarksheet10">
+                        <div class="dropzone-header">
+                            <div class="doc-badge-pill req">Required</div>
+                            <span class="doc-icon-main">📄</span>
+                            <h4>10th Standard Marksheet</h4>
+                            <p>SSC or equivalent board passing marksheet (PDF/JPG, Max 5MB)</p>
+                        </div>
+                        <div class="dropzone-body" onclick="document.getElementById('marksheet10').click()">
+                            <input type="file" id="marksheet10" name="marksheet10" accept=".pdf,image/jpeg,image/png" style="display:none;" onchange="handleFileSelected(this, 'previewMarksheet10', 'dropzoneMarksheet10')">
+                            <div class="dropzone-placeholder" id="placeholderMarksheet10">
+                                <span class="upload-cloud-icon">☁️</span>
+                                <strong>Click to Browse</strong> or Drag &amp; Drop File
+                                <small>Supported: PDF, JPG, PNG (Max 5MB)</small>
+                            </div>
+                            <div class="dropzone-preview" id="previewMarksheet10" style="display:none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Document 3: 12th Marksheet -->
+                    <div class="dropzone-card" id="dropzoneMarksheet12">
+                        <div class="dropzone-header">
+                            <div class="doc-badge-pill req">Required</div>
+                            <span class="doc-icon-main">📄</span>
+                            <h4>12th / Diploma Marksheet</h4>
+                            <p>HSC or final year Diploma marksheet (PDF/JPG, Max 5MB)</p>
+                        </div>
+                        <div class="dropzone-body" onclick="document.getElementById('marksheet12').click()">
+                            <input type="file" id="marksheet12" name="marksheet12" accept=".pdf,image/jpeg,image/png" style="display:none;" onchange="handleFileSelected(this, 'previewMarksheet12', 'dropzoneMarksheet12')">
+                            <div class="dropzone-placeholder" id="placeholderMarksheet12">
+                                <span class="upload-cloud-icon">☁️</span>
+                                <strong>Click to Browse</strong> or Drag &amp; Drop File
+                                <small>Supported: PDF, JPG, PNG (Max 5MB)</small>
+                            </div>
+                            <div class="dropzone-preview" id="previewMarksheet12" style="display:none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Document 4: Leaving Certificate -->
+                    <div class="dropzone-card" id="dropzoneLC">
+                        <div class="dropzone-header">
+                            <div class="doc-badge-pill req">Required</div>
+                            <span class="doc-icon-main">📜</span>
+                            <h4>College Leaving Certificate (LC / TC)</h4>
+                            <p>Transfer Certificate issued by previous institute (PDF/JPG, Max 5MB)</p>
+                        </div>
+                        <div class="dropzone-body" onclick="document.getElementById('leavingCertificate').click()">
+                            <input type="file" id="leavingCertificate" name="leavingCertificate" accept=".pdf,image/jpeg,image/png" style="display:none;" onchange="handleFileSelected(this, 'previewLC', 'dropzoneLC')">
+                            <div class="dropzone-placeholder" id="placeholderLC">
+                                <span class="upload-cloud-icon">☁️</span>
+                                <strong>Click to Browse</strong> or Drag &amp; Drop File
+                                <small>Supported: PDF, JPG, PNG (Max 5MB)</small>
+                            </div>
+                            <div class="dropzone-preview" id="previewLC" style="display:none;"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="step-action-bar">
+                    <button type="button" class="btn-wizard-nav btn-prev" onclick="navigateToStep(4)">
+                        <span>⬅</span> Previous Step
+                    </button>
+                    <button type="button" class="btn-wizard-nav btn-next" onclick="validateAndNext(5)">
+                        Next: Review &amp; Submit <span>➔</span>
+                    </button>
+                </div>
+            </section>
+
+
+            <!-- ======================================================= -->
+            <!-- STEP 6: REVIEW & FINAL SUBMIT -->
+            <!-- ======================================================= -->
+            <section class="wizard-step-section" id="stepSection6" data-step="6">
+                <div class="section-heading-card">
+                    <div class="sec-icon-badge">📋</div>
+                    <div class="sec-title-wrap">
+                        <h3>Application Summary &amp; Final Declaration</h3>
+                        <p>Please carefully review all filled information before final submission.</p>
+                    </div>
+                </div>
+
+                <!-- Review Summary Sections -->
+                <div class="review-grid-container" id="reviewSummaryContainer">
+
+                    <!-- Personal Summary -->
+                    <div class="review-card">
+                        <div class="review-card-header">
+                            <div class="r-title"><span>👤</span> Personal Information</div>
+                            <button type="button" class="btn-review-edit" onclick="navigateToStep(1)">✏ Edit</button>
+                        </div>
+                        <div class="review-card-body">
+                            <div class="r-row"><span class="r-k">Full Name:</span><strong class="r-v" id="revFullName">--</strong></div>
+                            <div class="r-row"><span class="r-k">Father's Name:</span><span class="r-v" id="revFatherName">--</span></div>
+                            <div class="r-row"><span class="r-k">Mother's Name:</span><span class="r-v" id="revMotherName">--</span></div>
+                            <div class="r-row"><span class="r-k">DOB &amp; Gender:</span><span class="r-v" id="revDobGender">--</span></div>
+                            <div class="r-row"><span class="r-k">Blood Group:</span><span class="r-v" id="revBloodGroup">--</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Summary -->
+                    <div class="review-card">
+                        <div class="review-card-header">
+                            <div class="r-title"><span>📞</span> Contact &amp; Address</div>
+                            <button type="button" class="btn-review-edit" onclick="navigateToStep(2)">✏ Edit</button>
+                        </div>
+                        <div class="review-card-body">
+                            <div class="r-row"><span class="r-k">Mobile:</span><strong class="r-v" id="revMobile">--</strong></div>
+                            <div class="r-row"><span class="r-k">Email:</span><span class="r-v" id="revEmail">--</span></div>
+                            <div class="r-row"><span class="r-k">Aadhaar:</span><span class="r-v" id="revAadhaar">--</span></div>
+                            <div class="r-row"><span class="r-k">Location:</span><span class="r-v" id="revLocation">--</span></div>
+                            <div class="r-row"><span class="r-k">Address:</span><span class="r-v" id="revAddress">--</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Academic Summary -->
+                    <div class="review-card">
+                        <div class="review-card-header">
+                            <div class="r-title"><span>🎓</span> Academic &amp; Scores</div>
+                            <button type="button" class="btn-review-edit" onclick="navigateToStep(3)">✏ Edit</button>
+                        </div>
+                        <div class="review-card-body">
+                            <div class="r-row"><span class="r-k">10th Board &amp; %:</span><span class="r-v" id="rev10th">--</span></div>
+                            <div class="r-row"><span class="r-k">12th Board &amp; %:</span><span class="r-v" id="rev12th">--</span></div>
+                            <div class="r-row"><span class="r-k">Entrance Exam:</span><strong class="r-v" id="revEntrance">--</strong></div>
+                        </div>
+                    </div>
+
+                    <!-- Course & AI Summary -->
+                    <div class="review-card highlight">
+                        <div class="review-card-header">
+                            <div class="r-title"><span>🏛️</span> Course Preference</div>
+                            <button type="button" class="btn-review-edit" onclick="navigateToStep(4)">✏ Edit</button>
+                        </div>
+                        <div class="review-card-body">
+                            <div class="r-row"><span class="r-k">Department:</span><strong class="r-v-branch" id="revDepartment">--</strong></div>
+                            <div class="r-row"><span class="r-k">Admission Quota:</span><span class="r-v" id="revAdmissionType">--</span></div>
+                            <div class="r-row"><span class="r-k">AI Prediction:</span><span class="r-v-badge" id="revAIPredict">--</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Documents Summary -->
+                    <div class="review-card full-width">
+                        <div class="review-card-header">
+                            <div class="r-title"><span>📁</span> Attached Documents</div>
+                            <button type="button" class="btn-review-edit" onclick="navigateToStep(5)">✏ Edit</button>
+                        </div>
+                        <div class="review-docs-row" id="revDocsList">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Legal Declaration -->
+                <div class="declaration-card">
+                    <label class="declaration-checkbox-label">
+                        <input type="checkbox" id="declaration" name="declaration" required>
+                        <span class="declaration-text">
+                            <strong>I hereby solemnly declare</strong> that all details, marks, and uploaded certificates provided in this application are true, complete, and correct to the best of my knowledge. I understand that any false information will result in immediate disqualification of admission under university norms.
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Action Button Group -->
+                <div class="final-submission-bar">
+                    <button type="button" class="btn-wizard-nav btn-prev" onclick="navigateToStep(5)">
+                        <span>⬅</span> Back to Documents
+                    </button>
+
+                    <div class="submit-action-cluster">
+                        <button type="button" class="btn-preview-print" onclick="window.print()">
+                            <span>🖨️</span> Print Draft
+                        </button>
+
+                        <button type="button" class="reset-btn" onclick="confirmResetForm()">
+                            <span>🔄</span> Reset Form
+                        </button>
+
+                        <button type="submit" class="submit-btn" id="mainSubmitBtn">
+                            <span>🚀</span> <span id="submitBtnLabel">Submit Final Application</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </form>
+
+    </main>
+
+    <!-- Floating AI Admission Assistant Widget -->
+    <div class="floating-ai-assistant-widget" id="floatingAiWidget">
+        <button type="button" class="ai-launcher-btn" id="aiLauncherBtn" onclick="toggleAiDrawer()" title="Ask AI Admission Assistant">
+            <span class="ai-launcher-icon">💬</span>
+            <span class="ai-launcher-label">Ask AI Assistant</span>
+            <span class="ai-online-dot"></span>
         </button>
 
-        <button type="reset" class="reset-btn">
-            <span>🔄</span> Reset Form
-        </button>
+        <!-- AI Chat Drawer -->
+        <div class="ai-chat-drawer" id="aiChatDrawer" style="display: none;">
+            <div class="ai-drawer-header">
+                <div class="ai-drawer-title">
+                    <span class="ai-bot-avatar">🤖</span>
+                    <div>
+                        <strong>Zeal AI Admission Assistant</strong>
+                        <small class="ai-status-online">● Online | Instant Answers</small>
+                    </div>
+                </div>
+                <button type="button" class="ai-drawer-close-btn" onclick="toggleAiDrawer()" title="Close Assistant">✖</button>
+            </div>
 
+            <!-- Quick Questions Chips -->
+            <div class="ai-quick-chips">
+                <button type="button" class="ai-chip" onclick="askAiQuick('What are the cutoffs for Computer Engineering?')">Computer Cutoffs?</button>
+                <button type="button" class="ai-chip" onclick="askAiQuick('What is the annual fee structure?')">Annual Fees?</button>
+                <button type="button" class="ai-chip" onclick="askAiQuick('What documents are required for admission?')">Documents List?</button>
+                <button type="button" class="ai-chip" onclick="askAiQuick('How do I track my admission status?')">Track Status?</button>
+            </div>
+
+            <!-- Chat History -->
+            <div class="ai-chat-messages" id="aiChatMessages">
+                <div class="ai-msg ai-bot">
+                    <div class="ai-bubble">
+                        Hello! 👋 I am your <strong>Zeal AI Admission Assistant</strong>. You can ask me about branch cutoffs, eligibility criteria, fees, required documents, or admission timelines!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input Bar -->
+            <form class="ai-chat-input-form" onsubmit="handleAiChatSubmit(event)">
+                <input type="text" id="aiChatInput" placeholder="Ask anything about admissions..." autocomplete="off">
+                <button type="submit" class="ai-send-btn" title="Send Message">➤</button>
+            </form>
+        </div>
     </div>
 
-</fieldset>
+    <!-- Post-Submission Acknowledgement Receipt Modal -->
+    <div class="modal-backdrop-receipt" id="receiptModal" style="display: none;">
+        <div class="receipt-modal-dialog">
+            <div class="receipt-header-banner">
+                <div class="receipt-success-icon">🎉</div>
+                <h3>Application Submitted Successfully!</h3>
+                <p>Your college admission application has been registered in the system.</p>
+            </div>
 
-</form>
+            <div class="receipt-body" id="receiptBody">
+                <div class="receipt-app-badge">
+                    <span class="label">APPLICATION ID</span>
+                    <strong class="app-id-code" id="receiptAppId">ADM-2026-0001</strong>
+                </div>
 
-</div>
+                <div class="receipt-details-table">
+                    <div class="receipt-detail-row">
+                        <span>Applicant Name:</span>
+                        <strong id="receiptStudentName">--</strong>
+                    </div>
+                    <div class="receipt-detail-row">
+                        <span>Selected Department:</span>
+                        <strong id="receiptDepartment">--</strong>
+                    </div>
+                    <div class="receipt-detail-row">
+                        <span>Registered Mobile:</span>
+                        <span id="receiptMobile">--</span>
+                    </div>
+                    <div class="receipt-detail-row">
+                        <span>Application Date:</span>
+                        <span id="receiptDate">--</span>
+                    </div>
+                    <div class="receipt-detail-row">
+                        <span>Initial Status:</span>
+                        <span class="badge-status-pending">Pending Verification</span>
+                    </div>
+                </div>
 
-<script src="script.js"></script>
+                <div class="receipt-instructions">
+                    💡 <strong>Next Steps:</strong> You can login to the <a href="student-login.html" class="receipt-link">Student Portal</a> using your Application ID and Date of Birth to track document verification status and pay admission fees.
+                </div>
+            </div>
+
+            <div class="receipt-footer-actions">
+                <button type="button" class="btn-receipt-action secondary" onclick="printReceipt()">
+                    🖨️ Print Receipt
+                </button>
+                <a href="view.html" class="btn-receipt-action primary" id="receiptNavBtn">
+                    📊 Return to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Bundle -->
+    <script src="script.js"></script>
 
 </body>
 </html>

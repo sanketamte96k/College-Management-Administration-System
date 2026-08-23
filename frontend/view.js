@@ -3923,7 +3923,7 @@ function renderAdmissionsTable() {
                     <div style="font-size: 40px; margin-bottom: 8px;">📂</div>
                     <strong style="font-size: 16px; color: #1E293B; display:block;">No applications found.</strong>
                     <p style="margin: 4px 0 16px 0; font-size: 13px;">Try changing your filter settings or submit a new candidate application.</p>
-                    <button class="btn-adm-primary" onclick="openNewAdmissionModal()">+ New Application</button>
+                    <a href="index.html" class="btn-adm-primary" style="display:inline-flex; align-items:center; text-decoration:none; gap:6px;">+ New Application</a>
                 </td>
             </tr>
         `;
@@ -4201,8 +4201,7 @@ function resetAdmissionsFilters() {
 }
 
 function openNewAdmissionModal() {
-    const modal = document.getElementById("newAdmissionModal");
-    if (modal) modal.style.display = "flex";
+    window.location.href = "index.html";
 }
 
 function closeNewAdmissionModal() {

@@ -1,10 +1,12 @@
+import os
 from flask import Blueprint, request, jsonify, session, current_app
 
 from services import StudentService
 from email_service import (
     send_student_confirmation_email,
     send_admin_notification_email,
-    send_verification_status_email
+    send_verification_status_email,
+    is_email_suppressed
 )
 from utils import admin_required, student_required
 
@@ -163,26 +165,45 @@ def create_student():
         # ----------------------------------------------------
         # EMAIL NOTIFICATIONS
         # ----------------------------------------------------
+        mail_suppressed = is_email_suppressed()
+
+        if mail_suppressed:
+            current_app.logger.info(
+                "Email notifications disabled; skipping student confirmation/admin notification."
+            )
+            return jsonify({
+                "message": "Admission Submitted Successfully.",
+                "student": student_dict,
+                "email_status": "disabled",
+                "email_note": "Email notifications are disabled."
+            }), 201
+
         mail_ext = current_app.extensions.get("mail")
 
         email_sent = False
         email_msg = ""
 
         if mail_ext:
+            try:
+                # Send confirmation email to student
+                email_sent, email_msg = (
+                    send_student_confirmation_email(
+                        mail_ext,
+                        student_dict
+                    )
+                )
 
-            # Send confirmation email to student
-            email_sent, email_msg = (
-                send_student_confirmation_email(
+                # Send notification to admin
+                send_admin_notification_email(
                     mail_ext,
                     student_dict
                 )
-            )
-
-            # Send notification to admin
-            send_admin_notification_email(
-                mail_ext,
-                student_dict
-            )
+            except Exception as mail_err:
+                current_app.logger.warning(
+                    f"Unexpected email error during student creation: {mail_err}"
+                )
+                email_sent = False
+                email_msg = str(mail_err)
 
         # ----------------------------------------------------
         # SUCCESS + EMAIL SENT

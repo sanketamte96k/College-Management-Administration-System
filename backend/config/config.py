@@ -214,7 +214,7 @@ class Config:
     )
 
     MAIL_SUPPRESS_SEND = (
-        os.getenv("MAIL_SUPPRESS_SEND", "False").lower() == "true"
+        os.getenv("MAIL_SUPPRESS_SEND", "False").lower() in ("true", "1", "yes")
     )
     MAIL_TIMEOUT = int(os.getenv("MAIL_TIMEOUT", 10))
 

@@ -56,12 +56,33 @@ def init_mail_config(app):
         app.config["MAIL_DEFAULT_SENDER"] = raw_sender
 
     app.config["MAIL_SUPPRESS_SEND"] = (
-        os.getenv("MAIL_SUPPRESS_SEND", "False").lower() == "true" or app.config.get("TESTING", False)
+        os.getenv("MAIL_SUPPRESS_SEND", "False").lower() in ("true", "1", "yes") or app.config.get("TESTING", False)
     )
-    app.config["MAIL_TIMEOUT"] = int(os.getenv("MAIL_TIMEOUT", 10))
+    mail_timeout = int(os.getenv("MAIL_TIMEOUT", 10))
+    app.config["MAIL_TIMEOUT"] = mail_timeout
+    try:
+        import socket
+        socket.setdefaulttimeout(float(mail_timeout))
+    except Exception:
+        pass
     
     mail = Mail(app)
     return mail
+
+
+def is_email_suppressed():
+    """
+    Determine if email sending is suppressed via environment variable or app config.
+    """
+    try:
+        from flask import current_app
+        if current_app:
+            val = current_app.config.get("MAIL_SUPPRESS_SEND")
+            if val is True or str(val).lower() in ("true", "1", "yes"):
+                return True
+    except Exception:
+        pass
+    return os.getenv("MAIL_SUPPRESS_SEND", "False").lower() in ("true", "1", "yes")
 
 
 def send_verification_status_email(mail, student, status, remarks=""):
@@ -176,7 +197,16 @@ def send_verification_status_email(mail, student, status, remarks=""):
 def send_student_confirmation_email(mail, student):
     """
     Send HTML confirmation email to the student upon successful admission submission.
+    Skips SMTP connection entirely if email sending is suppressed.
     """
+    if is_email_suppressed():
+        logger.info("Email notifications disabled; skipping student confirmation/admin notification.")
+        return False, "Email notifications disabled"
+
+    if not mail:
+        logger.warning("Flask-Mail instance is unavailable; skipping confirmation email.")
+        return False, "Email service not configured"
+
     student_email = student.get("email")
     if not student_email:
         logger.warning("No student email provided; skipping confirmation email.")
@@ -265,7 +295,16 @@ def send_student_confirmation_email(mail, student):
 def send_admin_notification_email(mail, student):
     """
     Send notification email to administrator when a new admission is submitted.
+    Skips SMTP connection entirely if email sending is suppressed.
     """
+    if is_email_suppressed():
+        logger.info("Email notifications disabled; skipping admin notification.")
+        return False, "Email notifications disabled"
+
+    if not mail:
+        logger.warning("Flask-Mail instance is unavailable; skipping admin notification.")
+        return False, "Email service not configured"
+
     admin_email = os.getenv("ADMIN_EMAIL", "admin@zeal.edu.in")
     try:
         subject = f"New Admission Received - #{student.get('id')} ({student.get('fullName')})"

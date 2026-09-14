@@ -1589,7 +1589,7 @@
                     <div class="crs-filter-grid">
                         <div class="crs-filter-field">
                             <label class="crs-filter-label">Department</label>
-                            <select id="courseDeptFilter" class="crs-control crs-select" onchange="loadCourses()">
+                            <select id="courseDeptFilter" class="crs-control crs-select" onchange="onCourseDeptFilterChange()">
                                 <option value="">All Departments</option>
                                 <option value="Computer Engineering">Computer Engineering</option>
                                 <option value="Information Technology">Information Technology</option>
@@ -1617,7 +1617,7 @@
 
                         <div class="crs-filter-field">
                             <label class="crs-filter-label">Academic Year</label>
-                            <select id="courseYearFilter" class="crs-control crs-select" onchange="loadCourses()">
+                            <select id="courseYearFilter" class="crs-control crs-select" onchange="onCourseYearFilterChange()">
                                 <option value="">All Academic Years</option>
                                 <option value="1">1st Year (FE)</option>
                                 <option value="2">2nd Year (SE)</option>
@@ -1628,7 +1628,7 @@
 
                         <div class="crs-filter-field">
                             <label class="crs-filter-label">Semester</label>
-                            <select id="courseSemFilter" class="crs-control crs-select" onchange="loadCourses()">
+                            <select id="courseSemFilter" class="crs-control crs-select" onchange="onCourseSemFilterChange()">
                                 <option value="">All Semesters</option>
                                 <option value="1">Semester 1</option>
                                 <option value="2">Semester 2</option>
@@ -5167,7 +5167,7 @@
     </div>
 </div>
 
-<script src="view.js?v=3"></script>
+<script src="view.js?v=4"></script>
 
 </body>
 

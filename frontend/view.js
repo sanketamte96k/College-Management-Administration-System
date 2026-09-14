@@ -3600,6 +3600,8 @@ function switchAdminSection(paneId, btnEl, pageTitle = "Dashboard Overview") {
         fetchStudentKpiStats();
     } else if (paneId === "pane-departments") {
         loadDepartments();
+    } else if (paneId === "pane-courses") {
+        loadCourses();
     } else if (paneId === "pane-examinations") {
         loadExaminations();
     } else if (paneId === "pane-reports") {
@@ -5269,6 +5271,90 @@ function renderCurriculumView(data) {
     container.innerHTML = html;
 }
 
+function onCourseDeptFilterChange() {
+    const deptSelect = document.getElementById("courseDeptFilter");
+    const progSelect = document.getElementById("courseProgramFilter");
+    if (deptSelect && progSelect) {
+        const selectedDept = deptSelect.value;
+        if (selectedDept) {
+            Array.from(progSelect.options).forEach(opt => {
+                if (!opt.value) {
+                    opt.hidden = false;
+                } else if (
+                    opt.value.includes(selectedDept) ||
+                    (selectedDept === "Computer Engineering" && opt.value.includes("Computer")) ||
+                    (selectedDept === "Information Technology" && opt.value.includes("Information")) ||
+                    (selectedDept === "Artificial Intelligence & Data Science" && (opt.value.includes("AI") || opt.value.includes("Data"))) ||
+                    (selectedDept === "Electronics & Telecommunication" && (opt.value.includes("Electronics") || opt.value.includes("Telecommunication"))) ||
+                    (selectedDept === "Mechanical Engineering" && opt.value.includes("Mechanical")) ||
+                    (selectedDept === "Civil Engineering" && opt.value.includes("Civil")) ||
+                    (selectedDept === "Electrical Engineering" && opt.value.includes("Electrical"))
+                ) {
+                    opt.hidden = false;
+                } else {
+                    opt.hidden = true;
+                }
+            });
+            if (progSelect.selectedOptions[0]?.hidden) {
+                progSelect.value = "";
+            }
+        } else {
+            Array.from(progSelect.options).forEach(opt => opt.hidden = false);
+        }
+    }
+    loadCourses();
+}
+
+function onCourseYearFilterChange() {
+    const yearSelect = document.getElementById("courseYearFilter");
+    const semSelect = document.getElementById("courseSemFilter");
+    if (!yearSelect || !semSelect) return;
+
+    const selectedYear = yearSelect.value;
+    const currentSem = semSelect.value;
+
+    if (!selectedYear) {
+        semSelect.innerHTML = `
+            <option value="">All Semesters</option>
+            <option value="1" ${currentSem === "1" ? "selected" : ""}>Semester 1</option>
+            <option value="2" ${currentSem === "2" ? "selected" : ""}>Semester 2</option>
+            <option value="3" ${currentSem === "3" ? "selected" : ""}>Semester 3</option>
+            <option value="4" ${currentSem === "4" ? "selected" : ""}>Semester 4</option>
+            <option value="5" ${currentSem === "5" ? "selected" : ""}>Semester 5</option>
+            <option value="6" ${currentSem === "6" ? "selected" : ""}>Semester 6</option>
+            <option value="7" ${currentSem === "7" ? "selected" : ""}>Semester 7</option>
+            <option value="8" ${currentSem === "8" ? "selected" : ""}>Semester 8</option>
+        `;
+    } else {
+        const y = parseInt(selectedYear);
+        const s1 = (y * 2) - 1;
+        const s2 = y * 2;
+        const keepSem = (currentSem === String(s1) || currentSem === String(s2)) ? currentSem : "";
+        semSelect.innerHTML = `
+            <option value="">All Year ${y} Semesters (Sem ${s1} & ${s2})</option>
+            <option value="${s1}" ${keepSem === String(s1) ? "selected" : ""}>Semester ${s1}</option>
+            <option value="${s2}" ${keepSem === String(s2) ? "selected" : ""}>Semester ${s2}</option>
+        `;
+    }
+    loadCourses();
+}
+
+function onCourseSemFilterChange() {
+    const yearSelect = document.getElementById("courseYearFilter");
+    const semSelect = document.getElementById("courseSemFilter");
+    if (!yearSelect || !semSelect) return;
+
+    const selectedSem = semSelect.value;
+    if (selectedSem) {
+        const s = parseInt(selectedSem);
+        const expectedYear = Math.ceil(s / 2);
+        if (yearSelect.value !== String(expectedYear)) {
+            yearSelect.value = String(expectedYear);
+        }
+    }
+    loadCourses();
+}
+
 function resetCourseFilters() {
     const dept = document.getElementById("courseDeptFilter");
     const prog = document.getElementById("courseProgramFilter");
@@ -5277,9 +5363,25 @@ function resetCourseFilters() {
     const search = document.getElementById("courseSearchInput");
 
     if (dept) dept.value = "";
-    if (prog) prog.value = "";
+    if (prog) {
+        prog.value = "";
+        Array.from(prog.options).forEach(opt => opt.hidden = false);
+    }
     if (yr) yr.value = "";
-    if (sem) sem.value = "";
+    if (sem) {
+        sem.innerHTML = `
+            <option value="">All Semesters</option>
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+            <option value="3">Semester 3</option>
+            <option value="4">Semester 4</option>
+            <option value="5">Semester 5</option>
+            <option value="6">Semester 6</option>
+            <option value="7">Semester 7</option>
+            <option value="8">Semester 8</option>
+        `;
+        sem.value = "";
+    }
     if (search) search.value = "";
 
     loadCourses();
@@ -5309,8 +5411,9 @@ function viewSemesterSubjects(yearNum, semNum) {
 
     if (!targetSem) return;
 
+    const yearSuffix = yearNum === 1 ? "1st" : yearNum === 2 ? "2nd" : yearNum === 3 ? "3rd" : "4th";
     if (titleEl) {
-        titleEl.textContent = `📚 ${targetSem.semester_name} Subjects Roster (${yearNum}st/nd/rd/th Year)`;
+        titleEl.textContent = `📚 ${targetSem.semester_name} Subjects Roster (${yearSuffix} Year)`;
     }
 
     const subs = targetSem.subjects || [];

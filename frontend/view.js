@@ -6429,13 +6429,16 @@ async function openRecordPaymentModal(studentId = null) {
 
     // Populate student select dropdown
     try {
-        const res = await fetch("/api/students/module?page=1&per_page=100");
+        const res = await fetch("/api/students?limit=200");
         if (res.ok) {
             const data = await res.json();
-            const students = data.students || [];
+            const students = Array.isArray(data) ? data : (data.students || []);
             select.innerHTML = `<option value="">-- Select Student --</option>` + students.map(s => `
-                <option value="${s.id}" ${studentId && s.id == studentId ? 'selected' : ''}>${s.fullName} (${s.department})</option>
+                <option value="${s.id}" ${studentId && String(s.id) === String(studentId) ? 'selected' : ''}>${s.fullName || s.name} (${s.department || s.course || 'Enrolled'})</option>
             `).join('');
+            if (studentId) {
+                select.value = studentId;
+            }
         }
     } catch (err) {
         console.error("Failed to load students for payment modal:", err);

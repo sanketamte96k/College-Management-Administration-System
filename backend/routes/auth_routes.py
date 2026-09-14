@@ -52,15 +52,23 @@ def api_logout():
 @rate_limit(max_attempts=10, window_seconds=60)
 def student_login():
     data = request.get_json() or request.form or {}
-    app_id = data.get("application_id") or data.get("id")
+    app_id_raw = str(data.get("application_id") or data.get("id") or "").strip()
     dob = sanitize_input(data.get("dob"))
 
-    if not app_id or not dob:
+    if not app_id_raw or not dob:
         return jsonify({"error": "Application ID and Date of Birth are required"}), 400
 
-    try:
-        app_id_int = int(app_id)
-    except ValueError:
+    app_id_int = None
+    if app_id_raw.isdigit():
+        app_id_int = int(app_id_raw)
+    elif "-" in app_id_raw:
+        parts = app_id_raw.split("-")
+        try:
+            app_id_int = int(parts[-1])
+        except (ValueError, IndexError):
+            pass
+
+    if app_id_int is None:
         return jsonify({"error": "Invalid Application ID format"}), 400
 
     student = Student.query.filter_by(id=app_id_int, dob=dob).first()

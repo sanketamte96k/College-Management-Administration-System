@@ -18,7 +18,7 @@ except Exception:
     pass
 
 from flask import Flask, send_from_directory, jsonify, session
-from config import config_by_name
+from config import config_by_name, get_database_uri, get_engine_options
 from models import db, Admin
 from email_service import init_mail_config
 from utils import setup_logger
@@ -43,29 +43,12 @@ def create_app(config_name=None):
     app.config.from_object(config_cls)
 
     # Database Configuration
-    database_url = os.environ.get("DATABASE_URL")
-    if database_url:
-        if database_url.startswith("mysql://"):
-            app.config["SQLALCHEMY_DATABASE_URI"] = database_url.replace("mysql://", "mysql+pymysql://", 1)
-        elif database_url.startswith("postgres://"):
-            app.config["SQLALCHEMY_DATABASE_URI"] = database_url.replace("postgres://", "postgresql://", 1)
-        else:
-            app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-    elif config_name == "test" or os.environ.get("FLASK_ENV") == "test" or os.environ.get("TESTING") == "True":
+    if config_name == "test" or os.environ.get("FLASK_ENV") == "test" or os.environ.get("TESTING") == "True":
         app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
-    elif os.environ.get("RENDER"):
-        app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.path.join(os.path.dirname(BASE_DIR), 'college_admission.db')}"
+        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {}
     else:
-        db_user = os.environ.get("DB_USER", "root")
-        db_password_raw = os.environ.get("DB_PASSWORD")
-        if not db_password_raw:
-            raise RuntimeError("Database configuration error: DB_PASSWORD must be configured. Please set the DB_PASSWORD environment variable or provide DATABASE_URL.")
-        db_password = urllib.parse.quote_plus(db_password_raw)
-        db_host = os.environ.get("DB_HOST", "localhost")
-        db_name = os.environ.get("DB_NAME", "college_admission_db")
-        db_port = os.environ.get("DB_PORT", "3306")
-
-        app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+        app.config["SQLALCHEMY_DATABASE_URI"] = get_database_uri()
+        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = get_engine_options(app.config["SQLALCHEMY_DATABASE_URI"])
 
     if os.environ.get("SECRET_KEY"):
         app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")

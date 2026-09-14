@@ -25,6 +25,12 @@ backend/uploads/
 .env.*
 !.env.example
 
+# Certificates & SSL Secrets
+*.pem
+*.crt
+*.key
+*.cert
+
 # VS Code
 .vscode/
 

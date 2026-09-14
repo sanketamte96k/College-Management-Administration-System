@@ -13,7 +13,7 @@ A full-stack college ERP and administration platform built to centralize institu
 
 ## 🌐 Live Demo
 
-🚀 **[College Management & Administration System — Live Demo](https://college-management-administration-system-production-9d39.up.railway.app)**
+🚀 **[College Management & Administration System — Live Demo](https://college-admission-system-pmtz.onrender.com)**
 
 ---
 
